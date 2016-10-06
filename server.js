@@ -6,45 +6,32 @@ if (process.env.NODE_ENV !== 'production') {
 
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const morgan = require('morgan');
+const path = require('path');
+const books = require('./routes/books');
+const users = require('./routes/users');
+const token = require('./routes/token');
+const favorites = require('./routes/favorites');
+const port = process.env.PORT || 8000;
 
 app.disable('x-powered-by');
-
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser')
-const morgan = require('morgan');
+app.use(express.static(path.join('public')));
 
 switch (app.get('env')) {
   case 'development':
-    app.use(morgan('dev'));
-    break;
+  app.use(morgan('dev'));
+  break;
 
   case 'production':
-    app.use(morgan('short'));
-    break;
+  app.use(morgan('short'));
+  break;
 
   default:
 }
-
 app.use(bodyParser.json());
 app.use(cookieParser());
-
-const path = require('path');
-
-app.use(express.static(path.join('public')));
-
-// CSRF protection
-app.use((req, res, next) => {
-  if (/json/.test(req.get('Accept'))) {
-    return next();
-  }
-
-  res.sendStatus(406);
-});
-
-const books = require('./routes/books');
-const favorites = require('./routes/favorites');
-const token = require('./routes/token');
-const users = require('./routes/users');
 
 app.use(books);
 app.use(favorites);
@@ -53,6 +40,15 @@ app.use(users);
 
 app.use((_req, res) => {
   res.sendStatus(404);
+});
+
+// CSRF protection
+app.use((req, res, next) => {
+  if (/json/.test(req.get('Accept'))) {
+    return next();
+  }
+
+  res.sendStatus(406);
 });
 
 // eslint-disable-next-line max-params
@@ -68,8 +64,6 @@ app.use((err, _req, res, _next) => {
   console.error(err.stack);
   res.sendStatus(500);
 });
-
-const port = process.env.PORT || 8000;
 
 app.listen(port, () => {
   if (app.get('env') !== 'test') {

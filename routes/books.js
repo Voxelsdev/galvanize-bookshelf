@@ -7,8 +7,6 @@ const router = express.Router();
 const knex = require('../knex');
 const { camelizeKeys, decamelizeKeys } = require('humps');
 
-// YOUR CODE HERE
-
 router.get('/books', (req, res, next) => {
   knex('books')
     .orderBy('title')
@@ -23,6 +21,9 @@ router.get('/books', (req, res, next) => {
 });
 
 router.get('/books/:id', (req, res, next) => {
+  if (isNaN(req.params.id)) {
+    return next(boom.create(404, 'Not Found'));
+  }
   knex('books')
     .where('id', req.params.id)
     .first()
@@ -44,23 +45,23 @@ router.post('/books', (req, res, next) => {
   const { title, author, genre, description, coverUrl } = req.body;
 
   if (!title || !title.trim()) {
-    return boom.create(400, 'Title must not be blank');
+    return next(boom.create(400, 'Title must not be blank'));
   }
 
   if (!author || !author.trim()) {
-    return boom.create(400, 'Author must not be blank');
+    return next(boom.create(400, 'Author must not be blank'));
   }
 
   if (!genre || !genre.trim()) {
-    return boom.create(400, 'Genre must not be blank');
+    return next(boom.create(400, 'Genre must not be blank'));
   }
 
   if (!description || !description.trim()) {
-    return boom.create(400, 'Description must not be blank');
+    return next(boom.create(400, 'Description must not be blank'));
   }
 
   if (!coverUrl || !coverUrl.trim()) {
-    return boom.create(400, 'Cover URL must not be blank');
+    return next(boom.create(400, 'Cover URL must not be blank'));
   }
 
   const insertBook = { title, author, genre, description, coverUrl };
@@ -78,6 +79,9 @@ router.post('/books', (req, res, next) => {
 });
 
 router.patch('/books/:id', (req, res, next) => {
+  if (isNaN(req.params.id)) {
+    return next(boom.create(404, 'Not Found'));
+  }
   knex('books')
     .where('id', req.params.id)
     .first()
@@ -125,7 +129,9 @@ router.patch('/books/:id', (req, res, next) => {
 
 router.delete('/books/:id', (req, res, next) => {
   let book;
-
+  if (isNaN(req.params.id)) {
+    return next(boom.create(404, 'Not Found'));
+  }
   knex('books')
     .where('id', req.params.id)
     .first()
