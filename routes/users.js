@@ -7,7 +7,6 @@ const knex = require('../knex');
 const bcrypt = require('bcrypt-as-promised');
 const boom = require('boom');
 const { camelizeKeys, decamelizeKeys } = require('humps');
-// YOUR CODE HERE
 
 router.post('/users', (req, res, next) => {
   const { email, firstName, password, lastName } = req.body;
@@ -29,14 +28,13 @@ router.post('/users', (req, res, next) => {
   }
 
   knex('users')
-    .where('email', email)
-    .then((user) => {
-      if (user.length) {
-        return next(boom.create(400, 'Email already exists'));
-      }
-    });
+  .where('email', email)
+  .then((user) => {
+    if (user.length) {
+      return next(boom.create(400, 'Email already exists'));
+    }
 
-  bcrypt.hash(password, 12)
+    bcrypt.hash(password, 12)
     .then((hashedPassword) => {
       const insertUser = { email, firstName, hashedPassword, lastName };
 
@@ -44,7 +42,7 @@ router.post('/users', (req, res, next) => {
     })
     .then((rows) => {
       const user = camelizeKeys(rows[0]);
-// 
+
       delete user.hashedPassword;
 
       res.send(user);
@@ -52,6 +50,7 @@ router.post('/users', (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+  });
 });
 
 module.exports = router;
