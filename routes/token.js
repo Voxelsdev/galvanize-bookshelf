@@ -7,6 +7,8 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const knex = require('../knex');
+const ev = require('express-validation');
+const validations = require('../validations/token');
 const { camelizeKeys, decamelizeKeys } = require('humps');
 
 function authorize (req, res, next) {
@@ -26,16 +28,16 @@ router.get('/token', authorize, (req, res, next) => {
 });
 
 
-router.post('/token', (req, res, next) => {
+router.post('/token', ev(validations.post), (req, res, next) => {
   const { email, password } = req.body;
 
-  if (!email || !email.trim()) {
-    return next(boom.create(400, 'Email must not be blank'));
-  }
-
-  if (!password || password.length < 8) {
-    return next(boom.create(400, 'Password must be at least 8 characters'));
-  }
+  // if (!email || !email.trim()) {
+  //   return next(boom.create(400, 'Email must not be blank'));
+  // }
+  //
+  // if (!password || password.length < 8) {
+  //   return next(boom.create(400, 'Password must be at least 8 characters'));
+  // }
 
   let user;
 

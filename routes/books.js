@@ -5,6 +5,8 @@ const boom = require('boom');
 const express = require('express');
 const router = express.Router();
 const knex = require('../knex');
+const ev = require('express-validation');
+const validations = require('../validations/books');
 const { camelizeKeys, decamelizeKeys } = require('humps');
 
 router.get('/books', (req, res, next) => {
@@ -41,28 +43,28 @@ router.get('/books/:id', (req, res, next) => {
     });
 });
 
-router.post('/books', (req, res, next) => {
+router.post('/books', ev(validations.post), (req, res, next) => {
   const { title, author, genre, description, coverUrl } = req.body;
 
-  if (!title || !title.trim()) {
-    return next(boom.create(400, 'Title must not be blank'));
-  }
-
-  if (!author || !author.trim()) {
-    return next(boom.create(400, 'Author must not be blank'));
-  }
-
-  if (!genre || !genre.trim()) {
-    return next(boom.create(400, 'Genre must not be blank'));
-  }
-
-  if (!description || !description.trim()) {
-    return next(boom.create(400, 'Description must not be blank'));
-  }
-
-  if (!coverUrl || !coverUrl.trim()) {
-    return next(boom.create(400, 'Cover URL must not be blank'));
-  }
+  // if (!title || !title.trim()) {
+  //   return next(boom.create(400, 'Title must not be blank'));
+  // }
+  //
+  // if (!author || !author.trim()) {
+  //   return next(boom.create(400, 'Author must not be blank'));
+  // }
+  //
+  // if (!genre || !genre.trim()) {
+  //   return next(boom.create(400, 'Genre must not be blank'));
+  // }
+  //
+  // if (!description || !description.trim()) {
+  //   return next(boom.create(400, 'Description must not be blank'));
+  // }
+  //
+  // if (!coverUrl || !coverUrl.trim()) {
+  //   return next(boom.create(400, 'Cover URL must not be blank'));
+  // }
 
   const insertBook = { title, author, genre, description, coverUrl };
 
@@ -78,7 +80,7 @@ router.post('/books', (req, res, next) => {
     });
 });
 
-router.patch('/books/:id', (req, res, next) => {
+router.patch('/books/:id', ev(validations.patch), (req, res, next) => {
   if (isNaN(req.params.id)) {
     return next(boom.create(404, 'Not Found'));
   }
@@ -91,27 +93,27 @@ router.patch('/books/:id', (req, res, next) => {
       }
 
       const { title, author, genre, description, coverUrl } = req.body;
-      const updateBook = {};
+      const updateBook = { title, author, genre, description, coverUrl };
 
-      if (title) {
-        updateBook.title = title;
-      }
-
-      if (author) {
-        updateBook.author = author;
-      }
-
-      if (genre) {
-        updateBook.genre = genre;
-      }
-
-      if (description) {
-        updateBook.description = description;
-      }
-
-      if (coverUrl) {
-        updateBook.coverUrl = coverUrl;
-      }
+      // if (title) {
+      //   updateBook.title = title;
+      // }
+      //
+      // if (author) {
+      //   updateBook.author = author;
+      // }
+      //
+      // if (genre) {
+      //   updateBook.genre = genre;
+      // }
+      //
+      // if (description) {
+      //   updateBook.description = description;
+      // }
+      //
+      // if (coverUrl) {
+      //   updateBook.coverUrl = coverUrl;
+      // }
 
       return knex('books')
         .update(decamelizeKeys(updateBook), '*')

@@ -6,6 +6,8 @@ const router = express.Router();
 const boom = require('boom');
 const jwt = require('jsonwebtoken');
 const knex = require('../knex');
+const ev = require('express-validation');
+const validations = require('../validations/favorites');
 const { camelizeKeys, decamelizeKeys } = require('humps');
 
 function authorize (req, res, next) {
@@ -68,13 +70,13 @@ function checkBlank(str) {
   }
 }
 
-router.post('/favorites', authorize, (req, res, next) => {
+router.post('/favorites', authorize, ev(validations.post), (req, res, next) => {
   const { bookId } = req.body;
   const { userId } = req.token;
 
-  if (isNaN(bookId)) {
-    return next(boom.create(400, 'Book ID must be an integer'));
-  }
+  // if (isNaN(bookId)) {
+  //   return next(boom.create(400, 'Book ID must be an integer'));
+  // }
 
   knex('books')
   .where('id', bookId)
